@@ -9,9 +9,6 @@ import time
 import pandas as pd
 
 
-# 네이버 기사에서 댓글 수집하여 저장하기
-
-
 # 경고 발생하면 무시.
 import warnings 
 warnings.filterwarnings('ignore')
@@ -35,7 +32,7 @@ def get_naver_news_comments(url):
 
     while True:
          # 현재 화면에 로딩된 댓글 개수 확인
-        comments = driver.find_elements(By.CSS_SELECTOR,"span.u_cbox_contents")
+        comments = driver.find_elements(By.CSS_SELECTOR,".u_cbox_comment_box")
 
         # 더보기 버튼을 누르기 전 댓글 개수 저장
         prev_count = len(comments)
@@ -56,7 +53,7 @@ def get_naver_news_comments(url):
             time.sleep(random.uniform(2, 3))
 
             # 클릭 후 댓글 개수 다시 확인
-            comments = driver.find_elements(By.CSS_SELECTOR,"span.u_cbox_contents")
+            comments = driver.find_elements(By.CSS_SELECTOR,".u_cbox_comment_box")
 
             current_count = len(comments)
             
@@ -74,28 +71,31 @@ def get_naver_news_comments(url):
     # 파싱
     soup = BeautifulSoup(html, "html.parser")
 
-    # 1) 작성자
-    nicknames = soup.select('span.u_cbox_nick')
-    list_nicknames = [nickname.text for nickname in nicknames]
+    comment_areas = soup.select(".u_cbox_comment_box")
 
-    # 2)댓글 시간
-    datetimes = soup.select('span.u_cbox_date')
-    list_datetimes = [datetime.text for datetime in datetimes]
+    list_sum = []
 
-    # 3)댓글 추출
-    comments = soup.select("span.u_cbox_contents")
-    list_contents = [
-    content.get_text(strip=True)
-    for content in comments
-    ]
+    for area in comment_areas:
 
-    print(f"댓글 수 : {len(comments)}")
+        # 작성자
+        nickname_tag = area.select_one(".u_cbox_nick")
+        # 작성 시간
+        datetime_tag = area.select_one(".u_cbox_date")
+        # 댓글 내용
+        content_tag = area.select_one(".u_cbox_contents")
 
-    for idx, comment in enumerate(comments, start=1):
-        print(f"[{idx}] {comment.get_text(strip=True)}")
+        nickname = nickname_tag.get_text(strip=True) if nickname_tag else ""
+        datetime = datetime_tag.get_text(strip=True) if datetime_tag else ""
+        content = content_tag.get_text(strip=True) if content_tag else "삭제된 댓글입니다."
+
+        list_sum.append((datetime, nickname, content))
+
     
-    # 작성자, 댓글 시간, 내용을 셋트로 취합
-    list_sum = list(zip(list_nicknames,list_datetimes,list_contents))
+
+    print(f"댓글 수 : {len(list_sum)}")
+    for (datetime, nickname, content) in list_sum:
+        print(f"{nickname} : {content}")
+
 
     # 드라이버 종료
     driver.quit()
@@ -109,12 +109,13 @@ if __name__ == '__main__':
         
         # 댓글 수집할 기사 url
         # url = "https://n.news.naver.com/article/comment/016/0002651674"
-        url = 'https://n.news.naver.com/article/comment/005/0001853121'
+        # url = 'https://n.news.naver.com/article/comment/005/0001853121'
+        url = 'https://n.news.naver.com/article/comment/028/0002808892'
 
         news_comments = get_naver_news_comments(url)
 
         # 엑셀의 첫줄에 들어갈 컬럼명
-        col = ['작성자','시간','내용']
+        col = ['시간','작성자','내용']
 
         # pandas 데이터 프레임 형태로 가공
         df = pd.DataFrame(news_comments, columns=col)
