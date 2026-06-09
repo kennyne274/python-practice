@@ -108,7 +108,6 @@ def get_naver_news_comments(url):
 if __name__ == '__main__':
         
         # 댓글 수집할 기사 url
-        # url = "https://n.news.naver.com/article/comment/016/0002651674"
         # url = 'https://n.news.naver.com/article/comment/005/0001853121'
         url = 'https://n.news.naver.com/article/comment/028/0002808892'
 
