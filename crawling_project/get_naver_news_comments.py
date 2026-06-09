@@ -8,6 +8,7 @@ import random
 import time
 import pandas as pd
 
+# 네이버 뉴스 댓글 수집 프로그램
 
 # 경고 발생하면 무시.
 import warnings 
@@ -73,7 +74,7 @@ def get_naver_news_comments(url):
 
     comment_areas = soup.select(".u_cbox_comment_box")
 
-    list_sum = []
+    comments_data = []
 
     for area in comment_areas:
 
@@ -83,17 +84,29 @@ def get_naver_news_comments(url):
         datetime_tag = area.select_one(".u_cbox_date")
         # 댓글 내용
         content_tag = area.select_one(".u_cbox_contents")
+        cleanbot_tag = area.select_one(".u_cbox_cleanbot_contents")
+        delete_tag = area.select_one(".u_cbox_delete_contents")
 
         nickname = nickname_tag.get_text(strip=True) if nickname_tag else ""
-        datetime = datetime_tag.get_text(strip=True) if datetime_tag else ""
-        content = content_tag.get_text(strip=True) if content_tag else "삭제된 댓글입니다."
+        comment_time = datetime_tag.get_text(strip=True) if datetime_tag else ""
 
-        list_sum.append((datetime, nickname, content))
+        # 일반 코멘트
+        if content_tag:
+            content = content_tag.get_text(strip=True)
+        # 클린봇이 부적절한 표현을 감지한 댓글입니다.
+        elif cleanbot_tag:
+            content = cleanbot_tag.get_text(strip=True)
+        # 작성자에 의해 삭제된 댓글입니다.
+        elif delete_tag:
+            content = delete_tag.get_text(strip=True)
+        else:
+            content = ""
 
-    
+        comments_data.append((comment_time, nickname, content))
+            
 
-    print(f"댓글 수 : {len(list_sum)}")
-    for (datetime, nickname, content) in list_sum:
+    print(f"댓글 수 : {len(comments_data)}")
+    for (comment_time, nickname, content) in comments_data:
         print(f"{nickname} : {content}")
 
 
@@ -101,7 +114,7 @@ def get_naver_news_comments(url):
     driver.quit()
 
     # 함수를 종료하며 list_sum을 결과물로 제출
-    return list_sum
+    return comments_data
 
 
 # 메인 실행 구간
@@ -123,3 +136,4 @@ if __name__ == '__main__':
         df.to_csv(f'news_comments.csv',
                         encoding='utf-8-sig',
                         index=False)
+
