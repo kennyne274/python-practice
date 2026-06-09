@@ -1,6 +1,7 @@
 import random
 import time
 
+# 초보용 가위바위보 게임 프로젝트
 
 choices = ["가위", "바위", "보"]
 
