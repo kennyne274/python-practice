@@ -20,12 +20,12 @@ def organize_files(src):
 
     # 카테고리별 폴더
     categories = {
-        'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
-        'documents': ['.csv','.pdf', '.doc', '.docx', '.xls','.txt', '.xlsx', '.ppt', '.pptx', '.hwpx'],
-        'code' : ['.py', '.ipynb', '.c', '.html', '.css', '.js'],
-        'videos': ['.mp4', '.avi', '.mkv', '.mov'],
+        'Images': ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+        'Documents': ['.csv','.pdf', '.doc', '.docx', '.xls','.txt', '.xlsx', '.ppt', '.pptx', '.hwpx'],
+        'Code' : ['.py', '.ipynb', '.c', '.html', '.css', '.js'],
+        'Videos': ['.mp4', '.avi', '.mkv', '.mov'],
         'Audio': ['.mp3', '.wav', '.flac', '.m4a'],
-        'archives': ['.zip', '.rar', '.7z', '.tar', '.gz'],
+        'Archives': ['.zip', '.rar', '.7z', '.tar', '.gz'],
         'Installers': ['.exe', '.msi', '.dmg', '.apk']
     }
 
@@ -92,6 +92,7 @@ def organize_files(src):
                 skipped_count += 1
 
     print(f"\n총 {moved}개의 파일을 정리했습니다.")
+    print(f"이동 실패한 파일: {skipped_count}개")
 
 if __name__ == "__main__":
     src = get_downloads_folder()
