@@ -13,23 +13,24 @@ def get_downloads_folder():
         raise FileNotFoundError("다운로드 폴더를 찾을 수 없습니다.")
 
 # 파일 정리
-def organize_files(): 
+def organize_files(src): 
 
     moved = 0 # 이동한 파일수
     skipped_count = 0 # 스킵한 파일수
 
-    # 카테고리별 폴더 매핑
+    # 카테고리별 폴더
     categories = {
         'images': ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
-        'documents': ['.pdf', '.doc', '.docx', '.txt', '.xlsx', '.pptx', '.hwpx'],
+        'documents': ['.csv','.pdf', '.doc', '.docx', '.xls','.txt', '.xlsx', '.ppt', '.pptx', '.hwpx'],
         'code' : ['.py', '.ipynb', '.c', '.html', '.css', '.js'],
         'videos': ['.mp4', '.avi', '.mkv', '.mov'],
-        'music': ['.mp3', '.wav', '.flac'],
-        'archives': ['.zip', '.rar', '.7z']
+        'Audio': ['.mp3', '.wav', '.flac', '.m4a'],
+        'archives': ['.zip', '.rar', '.7z', '.tar', '.gz'],
+        'Installers': ['.exe', '.msi', '.dmg', '.apk']
     }
 
-    # 원본 경로 설정 (다운로드 폴더)
-    source = get_downloads_folder()
+    # 원본 경로 설정 
+    source = src
     
     # 카테고리 딕셔너리에서 키와 value를 쌍으로 꺼냄
     for category, exts in categories.items():
@@ -53,7 +54,7 @@ def organize_files():
                         print(f"파일 이동 실패 {file.name}")
                         skipped_count += 1
                     except PermissionError:
-                        print(f"권한 오류 (건너뜀): {file.name}")
+                        print(f"권한 오류 : {file.name}")
                         skipped_count += 1
 
                 # 파일 충돌 처리    
@@ -93,4 +94,5 @@ def organize_files():
     print(f"\n총 {moved}개의 파일을 정리했습니다.")
 
 if __name__ == "__main__":
-    organize_files()
+    src = get_downloads_folder()
+    organize_files(src)
